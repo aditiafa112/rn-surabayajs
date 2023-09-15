@@ -13,7 +13,7 @@ import Header from '../components/Header';
 import {MENU, PROMO_URI} from '../data';
 import ModalPromo from '../components/ModalPromo';
 
-export default function HomeScreen() {
+export default function HomeScreen({navigation}) {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
@@ -48,6 +48,7 @@ export default function HomeScreen() {
                   key={item.id}
                   name={item.name}
                   price={item.price}
+                  onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               );
             })}

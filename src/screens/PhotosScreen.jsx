@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  RefreshControl,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../components/Header';
@@ -13,17 +14,24 @@ import Container from '../components/Container';
 const PhotosScreen = () => {
   const [photos, setPhotos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const getData = () => {
+    setIsLoading(true);
+    return fetch('https://jsonplaceholder.typicode.com/photos')
+      .then(response => response.json())
+      .then(json => setPhotos(json))
+      .finally(() => setIsLoading(false));
+  };
 
   useEffect(() => {
-    const data = () => {
-      setIsLoading(true);
-      fetch('https://jsonplaceholder.typicode.com/photos')
-        .then(response => response.json())
-        .then(json => setPhotos(json))
-        .finally(() => setIsLoading(false));
-    };
+    getData();
+  }, []);
 
-    data();
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await getData();
+    setRefreshing(false);
   }, []);
 
   return (
@@ -33,6 +41,9 @@ const PhotosScreen = () => {
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           keyExtractor={item => item.id}
           data={photos}
           ListHeaderComponent={<HeaderPhoto />}
@@ -52,6 +63,22 @@ const PhotosScreen = () => {
 };
 
 export default PhotosScreen;
+
+const HeaderPhoto = () => {
+  return (
+    <View style={styles.headerView}>
+      <Text style={styles.componentText}>List Photo</Text>
+    </View>
+  );
+};
+
+const EmptyPhoto = () => {
+  return (
+    <View style={styles.EmptyView}>
+      <Text style={styles.componentText}>There is no photo</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   listItem: {
@@ -73,24 +100,17 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
+  headerView: {
+    alignItems: 'left',
+    margin: 16,
+  },
+  componentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#313131',
+  },
+  EmptyView: {
+    alignItems: 'center',
+    margin: 16,
+  },
 });
-
-const HeaderPhoto = () => {
-  return (
-    <View style={{alignItems: 'left', margin: 16}}>
-      <Text style={{fontSize: 16, fontWeight: '600', color: '#313131'}}>
-        List Photo
-      </Text>
-    </View>
-  );
-};
-
-const EmptyPhoto = () => {
-  return (
-    <View style={{alignItems: 'center', margin: 16}}>
-      <Text style={{fontSize: 16, fontWeight: '600', color: '#313131'}}>
-        There is no photo
-      </Text>
-    </View>
-  );
-};

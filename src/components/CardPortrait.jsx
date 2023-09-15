@@ -1,12 +1,12 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, Pressable, StyleSheet, Text} from 'react-native';
 import React from 'react';
 
 const formatCurrency = num =>
   'Rp.' + new Intl.NumberFormat('id-ID').format(num);
 
-const CardPortrait = ({name, price}) => {
+const CardPortrait = ({name, price, onPress}) => {
   return (
-    <View style={styles.portraitCard}>
+    <Pressable style={styles.portraitCard} onPress={onPress}>
       <Image
         source={require('../assets/croissant.jpg')}
         style={styles.cardImage}
@@ -17,7 +17,7 @@ const CardPortrait = ({name, price}) => {
       <Text style={styles.cardPrice} numberOfLines={1}>
         {formatCurrency(price)}
       </Text>
-    </View>
+    </Pressable>
   );
 };
 
